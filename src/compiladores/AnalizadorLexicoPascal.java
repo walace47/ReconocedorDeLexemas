@@ -5,7 +5,13 @@
  */
 package compiladores;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -291,6 +297,7 @@ public class AnalizadorLexicoPascal {
         }
         return respuesta;
     }
+    
 
     public static void main(String[] args) {
         /*if (args.length < 1) {
@@ -300,6 +307,19 @@ public class AnalizadorLexicoPascal {
         //String cadena = args[0];
         cadena = "program _algunid           =                             ";
         String cadenaResultante = "";
+       /* try {
+            LectorArchivoFuente lector = new LectorArchivoFuente(args[0]);
+            cadena = lector.retornarLinea();
+            while(!cadena.equalsIgnoreCase("fin de archivo")){
+                cadenaResultante = cadenaResultante + automata();
+                cadena = lector.retornarLinea();
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(AnalizadorLexicoPascal.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(AnalizadorLexicoPascal.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
+       
         //tiene que tener almenos un elemento la cadena
         llenarPatronesYTokens();
         if (cadena.length() >= 1) {
