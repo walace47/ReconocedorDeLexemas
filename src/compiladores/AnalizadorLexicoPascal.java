@@ -92,7 +92,7 @@ public class AnalizadorLexicoPascal {
                         break;
                     //se consume toda la cadena hasta el cierre del comentario    
                     case '{':
-                        consumirComentario();
+                        cadenaRespuesta = consumirComentario() + automata();
                         break;
                     //copio salto de linea    
                     case '\n':
@@ -163,20 +163,29 @@ public class AnalizadorLexicoPascal {
                         }
                         break;
                     case '<':
+                        //sospecha de token menor
                         if (longitud > 1) {
-                            if (cadena.charAt(1) == '=') {
-                                cadena = cadena.substring(2);
-                                cadenaRespuesta = tokenMenorIgual + " " + automata();
-
-                            } else if (cadena.charAt(1) == '>') {
-                                cadena = cadena.substring(2);
-                                cadenaRespuesta = tokenDistinto + " " + automata();
-                            } else {
-                                cadena = cadena.substring(1);
-                                cadenaRespuesta = tokenMenor + " " + automata();
+                            //si hay un caracter mas verifico que tipo de caracter es
+                            switch (cadena.charAt(1)) {
+                                case '=':
+                                    //retorna token menor igual consume dos letras
+                                    cadena = cadena.substring(2);
+                                    cadenaRespuesta = tokenMenorIgual + " " + automata();
+                                    break;
+                                case '>':
+                                    //retorna token distinto consume dos letras
+                                    cadena = cadena.substring(2);
+                                    cadenaRespuesta = tokenDistinto + " " + automata();
+                                    break;
+                                default:
+                                    //Si es otro caracter cosume una letra, (la leida) y retorna tokenMenor
+                                    cadena = cadena.substring(1);
+                                    cadenaRespuesta = tokenMenor + " " + automata();
+                                    break;
                             }
 
                         } else {
+                            //si es el ultimo caracter retorna token menor
                             cadena = cadena.substring(1);
                             cadenaRespuesta = tokenMenor + " " + automata();
                         }
@@ -190,7 +199,10 @@ public class AnalizadorLexicoPascal {
                             cadenaRespuesta = tokenDosPuntos + " " + automata();
                         }
                         break;
-
+                    default:
+                        cadena = cadena.substring(1);
+                        cadenaRespuesta = "Caracter_No_Valido" + automata();
+                        break;
                 }
             }
         }
@@ -198,16 +210,19 @@ public class AnalizadorLexicoPascal {
         return cadenaRespuesta;
     }
 
-    public static void consumirComentario() {
+    public static String consumirComentario() {
         //Te consume la cadena hasta e fin del comentario
         //Sino esta se consume toda la cadena y se llama al automata
         int posicion;
+        String respuesta = "";
         if ((posicion = cadena.indexOf("}")) == -1) {
+            //Si el comentario no cierra se borra toda la cadena, y retorna mensaje de error
             cadena = "";
+            respuesta = "Falta_cerrar_comentario ";
         } else {
             cadena = cadena.substring(posicion);
         }
-        automata();
+        return respuesta;
     }
 
     public static String sospechaNumero() {
