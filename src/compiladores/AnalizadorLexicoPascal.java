@@ -262,10 +262,8 @@ public class AnalizadorLexicoPascal {
         String token;
         token = mapa_ids.get(cadena.toLowerCase());
         if (token == null) {
-            token = tokenID;
-        } else {
             //Si es un id, retorna token_id_lexema
-            token = token + "_" + cadena.toLowerCase();
+            token = tokenID + "_" + cadena.toLowerCase();
         }
         return token;
     }
@@ -285,7 +283,7 @@ public class AnalizadorLexicoPascal {
          }*/
         //Recorta la cadena en espacios en blanco
         //String cadena = args[0];
-        cadena = "program _algunid ";
+        cadena = "program _algunid           =                             ";
         String cadenaResultante = "";
         //tiene que tener almenos un elemento la cadena
         llenarPatronesYTokens();
