@@ -6,6 +6,7 @@
 package compiladores;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -20,7 +21,8 @@ public class LectorArchivoFuente {
     private BufferedReader reader;
 
     public LectorArchivoFuente(String archivo) throws FileNotFoundException {
-        file  = new FileReader(archivo);
+        String path =  new File("").getAbsolutePath();
+        file  = new FileReader(path+"/"+archivo);
         reader  = new BufferedReader(file);
     }
     
@@ -28,8 +30,9 @@ public class LectorArchivoFuente {
         String cadena,respuesta;
         
         if((cadena = reader.readLine()) != null){
-            respuesta = cadena;
+            respuesta = cadena + "\n";
         }else{
+           
             reader.close();
             respuesta = "Fin de archivo";
         }

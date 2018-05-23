@@ -5,7 +5,9 @@
  */
 package compiladores;
 
+import compiladores.LectorArchivoFuente;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -22,6 +24,7 @@ public class AnalizadorLexicoPascal {
     /**
      * @param args the command line arguments
      */
+    private static LectorArchivoFuente lector;
     private final static String expresionRegularID = "[a-zA-Z_][a-zA-Z_0-9]*";
     private static HashMap<String, String> mapa_ids = new HashMap<>();
 
@@ -197,6 +200,7 @@ public class AnalizadorLexicoPascal {
                         }
                         break;
                     case ':':
+                        //Sospecha de asignacion
                         if (longitud > 1 && cadena.charAt(1) == '=') {
                             cadena = cadena.substring(2);
                             cadenaRespuesta = tokenAsignacion + " " + automata();
@@ -207,7 +211,7 @@ public class AnalizadorLexicoPascal {
                         break;
                     default:
                         cadena = cadena.substring(1);
-                        cadenaRespuesta = "Caracter_No_Valido" + automata();
+                        cadenaRespuesta = "Caracter_No_Valido = " + puntero + automata();
                         break;
                 }
             }
@@ -224,9 +228,26 @@ public class AnalizadorLexicoPascal {
         if ((posicion = cadena.indexOf("}")) == -1) {
             //Si el comentario no cierra se borra toda la cadena, y retorna mensaje de error
             cadena = "";
-            respuesta = "Falta_cerrar_comentario ";
-        } else {
-            cadena = cadena.substring(posicion);
+            try {
+                while (!(cadena = lector.retornarLinea()).contains("}")) {
+
+                    if (cadena.equalsIgnoreCase("Fin de archivo")) {
+
+                        respuesta = "Falta_cerrar_comentario ";
+                        return respuesta;
+                    }
+                    cadena = "";
+                }
+
+            } catch (IOException ex) {
+                return "Falta_cerrar_comentario ";
+                //Logger.getLogger(AnalizadorLexicoPascal.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+        //el fin de comentario puede estar en otras lineas
+        if ((posicion = cadena.indexOf("}")) != -1) {
+            cadena = cadena.substring(posicion + 1);
         }
         return respuesta;
     }
@@ -297,36 +318,35 @@ public class AnalizadorLexicoPascal {
         }
         return respuesta;
     }
-    
 
     public static void main(String[] args) {
-        /*if (args.length < 1) {
-         System.err.println("Porfavor ingrese el archivo de lectura como parametro");
-         }*/
-        //Recorta la cadena en espacios en blanco
-        //String cadena = args[0];
-        cadena = "program _algunid           =                             ";
-        String cadenaResultante = "";
-       /* try {
-            LectorArchivoFuente lector = new LectorArchivoFuente(args[0]);
-            cadena = lector.retornarLinea();
-            while(!cadena.equalsIgnoreCase("fin de archivo")){
-                cadenaResultante = cadenaResultante + automata();
-                cadena = lector.retornarLinea();
-            }
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(AnalizadorLexicoPascal.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(AnalizadorLexicoPascal.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
-       
-        //tiene que tener almenos un elemento la cadena
-        llenarPatronesYTokens();
-        if (cadena.length() >= 1) {
-            cadenaResultante = automata();
-        }
-        System.out.println(cadenaResultante);
+        if (args.length < 1) {
+            System.err.println("Porfavor ingrese el archivo de lectura como parametro");
+        } else {
+            //Recorta la cadena en espacios en blanco
+            //String cadena = args[0];
+            cadena = "";
 
+            String cadenaResultante = "";
+            try {
+                llenarPatronesYTokens();
+                lector = new LectorArchivoFuente(args[0]);
+                while (!(cadena = lector.retornarLinea()).equalsIgnoreCase("fin de archivo")) {
+                    cadenaResultante = cadenaResultante + automata();
+                }
+            } catch (FileNotFoundException ex) {
+                System.err.println("Archivo no encontrado porfavor coloque el archivo al lado del .jar");
+            } catch (IOException ex) {
+                //  Logger.getLogger(AnalizadorLexicoPascal.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            //tiene que tener almenos un elemento la cadena
+            /*if (cadena.length() >= 1) {
+             cadenaResultante = automata();
+             }*/
+            System.out.println(cadenaResultante);
+
+        }
     }
 
 }
